@@ -7,12 +7,12 @@ public class ServidorRMI {
         try {
 
             SIS ModeloSIS = new SISImpl();
-//            SIR ModeloSIR = new SIRImpl();
+            SIR ModeloSIR = new SIRImpl();
 
             Registry registry = LocateRegistry.createRegistry(5000);
 
             registry.rebind("SIS", ModeloSIS);
-//            Registry.rebind("SIR", ModeloSIR);
+            registry.rebind("SIR", ModeloSIR);
 
             System.out.println("Servidor ativo porta: 5000");
         }

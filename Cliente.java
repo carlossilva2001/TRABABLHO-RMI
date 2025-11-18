@@ -1,28 +1,68 @@
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.Scanner;
 
 public class Cliente {
     
-public static void main(String[] args) {
-    double suceptivel = 900000.0;
-    double infectados = 100000.0;
-    double recuperados = 0.0;
-    double populacaoTotal = Math.max(suceptivel + infectados + recuperados, 0.0);
-    double beta = 0.3;   // Taxa de transmissão
-    double gamma = 0.1;  // Taxa de recuperação
-    int dias = 365; // Número de dias para simulação
-    double passo = 0.1;
+    public static void main(String[] args) {
 
-    try {
-        Registry registry = LocateRegistry.getRegistry("localhost", 5000);
-        SIS sis = (SIS) registry.lookup("SIS");
+        Scanner entrada = new Scanner(System.in);
 
-        String resultado = sis.CalcularSIS(suceptivel, infectados, populacaoTotal, beta, gamma, dias, passo);
-        System.out.println("Resultados da simulação SIS:");
+        double suceptivel = 0.0;
+        double infectados = 0.0;
+        double recuperados = 0.0;
+        double populacaoTotal = 0.0;  //Math.max(suceptivel + infectados + recuperados, 0.0);
+        double beta = 0.0;   // Taxa de transmissão
+        double gamma = 0.0;  // Taxa de recuperação
+        int dias = 0; // Número de dias para simulação
+        double passo = 0.0;
+        String resultado = "";
+
+
+        System.out.println("Bem vindo ao Cliente RMI para simulação SIR e SIS.");
+
+        System.out.println("Opções de Serviços: ");
+        System.out.println("1 - Modelo SIR");
+        System.out.println("2 - Modelo SIS");
+        System.out.print("Escolha o modelo (1 ou 2): ");
+        int escolha = entrada.nextInt();
+        System.out.print("Digite o número de suscetíveis iniciais: ");
+        suceptivel = entrada.nextDouble();
+        System.out.print("Digite o número de infectados iniciais: ");
+        infectados = entrada.nextDouble();
+        if(escolha == 1){
+            System.out.print("Digite o número de recuperados iniciais: ");
+            recuperados = entrada.nextDouble();
+        }
+        populacaoTotal = suceptivel + infectados + recuperados;
+        System.out.print("Digite a taxa de transmissão (beta): ");
+        beta = entrada.nextDouble();
+        System.out.print("Digite a taxa de recuperação (gamma): ");
+        gamma = entrada.nextDouble();
+        System.out.print("Digite o número de dias para simulação: ");
+        dias = entrada.nextInt();
+        System.out.print("Digite o passo de tempo (ex: 0.1): ");
+        passo = entrada.nextDouble();
+        entrada.close();
+        try {
+            Registry registry = LocateRegistry.getRegistry("localhost", 5000);
+            SIR sir = (SIR) registry.lookup("SIR");
+            SIS sis = (SIS) registry.lookup("SIS");
+
+            if(escolha == 1){
+                resultado = sir.CalcularSIR(suceptivel, infectados, recuperados, populacaoTotal, beta, gamma, dias, passo);
+            } else if (escolha == 2){
+                resultado = sis.CalcularSIS(suceptivel, infectados, populacaoTotal, beta, gamma, dias, passo);
+            } else {
+                System.out.println("Opção inválida. Encerrando o cliente.");
+        }
+
+        } catch (Exception e) {
+            System.out.println("Erro no cliente: " + e.getMessage());
+        }
+        
+        System.out.println("Resultados da simulação:");
         System.out.println(resultado);
-    } catch (Exception e) {
-        System.out.println("Erro no cliente: " + e.getMessage());
     }
-}
 
 }
